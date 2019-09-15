@@ -77,6 +77,6 @@ def resize_img():
 
 
 if __name__ == '__main__':
-    # get_img_data()
-    # get_features()
+    get_img_data()
+    get_features()
     resize_img()
