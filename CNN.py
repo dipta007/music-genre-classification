@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import OneHotEncoder
 from tensorflow import keras
+from dataset_tools import getDataset
+from config import filesPerGenre, sliceSize, validationRatio, testRatio, nbEpoch
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -12,41 +14,28 @@ warnings.filterwarnings('ignore')
 
 def get_data():
     genres = 'blues classical country disco hiphop jazz metal pop reggae rock'.split()
-    X = []
-    Y = []
-
-    for g in genres:
-        for filename in os.listdir(f'./data/img_data_resized/{g}'):
-            x = np.asarray(Image.open(f'./data/img_data_resized/{g}/{filename}'))
-            X.append(x)
-            Y.append(g)
-        print(f'{g} completed')
-
-    X = np.asarray(X)
-
-    label_encoder = LabelEncoder()
-    integer_encoded = label_encoder.fit_transform(Y)
-
-    onehot_encoder = OneHotEncoder(sparse=False)
-    integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
-    onehot_encoded = onehot_encoder.fit_transform(integer_encoded)
-    Y = onehot_encoded
-    print(X.shape)
-    print(Y.shape)
-
-    return train_test_split(X, Y, test_size=0.1, random_state=4)
+    train_X, train_y, validation_X, validation_y = getDataset(filesPerGenre, genres, sliceSize, validationRatio,                                                      testRatio, mode="train")
+    test_X, test_y = getDataset(filesPerGenre, genres, sliceSize, validationRatio, testRatio, mode="test")
+    return train_X, train_y, validation_X, validation_y, test_X, test_y
 
 
 def get_model():
     model = keras.models.Sequential([
-        keras.layers.Conv2D(64, (3, 3), activation=keras.activations.relu, input_shape=(500, 500, 4)),
+        keras.layers.Conv2D(64, (2, 2), activation=keras.activations.elu, input_shape=(128, 128, 1)),
         keras.layers.MaxPooling2D(2, 2),
 
-        keras.layers.Conv2D(128, (3, 3), activation=keras.activations.relu),
+        keras.layers.Conv2D(128, (2, 2), activation=keras.activations.elu),
+        keras.layers.MaxPooling2D(2, 2),
+
+        keras.layers.Conv2D(256, (2, 2), activation=keras.activations.elu),
+        keras.layers.MaxPooling2D(2, 2),
+
+        keras.layers.Conv2D(512, (2, 2), activation=keras.activations.elu),
         keras.layers.MaxPooling2D(2, 2),
 
         keras.layers.Flatten(),
-        keras.layers.Dense(64, activation=keras.activations.relu),
+        keras.layers.Dense(1024, activation=keras.activations.elu),
+        keras.layers.Dropout(0.5),
         keras.layers.Dense(10, activation=keras.activations.softmax),
     ])
 
@@ -54,15 +43,16 @@ def get_model():
 
 
 def main():
-    X_train, X_test, y_train, y_test = get_data()
+    train_X, train_y, validation_X, validation_y, test_X, test_y = get_data()
     model = get_model()
     model.compile(optimizer=keras.optimizers.RMSprop(0.001),
                   loss=keras.losses.categorical_crossentropy,
                   metrics=['accuracy'])
 
     early_stopping = keras.callbacks.EarlyStopping(monitor='loss', patience=4)
-    model.fit(X_train, y_train, epochs=20, callbacks=[early_stopping])
-    model.evaluate(X_test, y_test)
+    model.fit(train_X, train_y, epochs=nbEpoch, callbacks=[early_stopping], shuffle=True,
+                validation_data=(validation_X, validation_y))
+    model.evaluate(test_X, test_y)
 
 
 if __name__ == '__main__':

@@ -5,6 +5,7 @@ import os
 import pathlib
 import csv
 from PIL import Image
+from spectogram import createSpectrogramsFromAudio, createSlicesFromSpectrograms
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -76,7 +77,39 @@ def resize_img():
         print(f'{g} completed')
 
 
+def convert_to_mp3():
+    print("Starting to convert to mp3")
+    pathlib.Path(f'./data/raw').mkdir(parents=True, exist_ok=True)
+    for f in os.listdir('./data/genres'):
+        if not os.path.isfile(f):
+            for mp3 in os.listdir(os.path.join('./data/genres', f)):
+                os.system(f"cp ./data/genres/{f}/{mp3} ./data/raw")
+
+    files = os.listdir('./data/raw/')
+    os.chdir('./data/raw/')
+
+    for (ind, file) in enumerate(files):
+        if file.endswith('.au'):
+            os.system("sox " + str(file) + " " + str(file[:-3]) + ".mp3")
+        if ind % 10 == 0:
+            print(f"Completed {ind//10}%")
+
+    os.system("rm *.au")
+
+
+def create_slices():
+    print("Creating spectrograms...")
+    createSpectrogramsFromAudio()
+    print("Spectrograms created!")
+
+    print("Creating slices...")
+    createSlicesFromSpectrograms()
+    print("Slices created!")
+
+
 if __name__ == '__main__':
-    get_img_data()
-    get_features()
-    resize_img()
+    # get_img_data()
+    # get_features()
+    # resize_img()
+    # convert_to_mp3()
+    create_slices()
