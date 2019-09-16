@@ -35,22 +35,17 @@ def get_model():
 
 def main():
     X_train, X_test, y_train, y_test = get_data()
-    x_val = X_train[:200]
-    partial_x_train = X_train[200:]
-
-    y_val = y_train[:200]
-    partial_y_train = y_train[200:]
 
     model = get_model()
     model.compile(optimizer='adam',
                   loss='sparse_categorical_crossentropy',
                   metrics=['accuracy'])
 
-    model.fit(partial_x_train,
-              partial_y_train,
+    model.fit(X_train,
+              y_train,
               epochs=30,
               batch_size=512,
-              validation_data=(x_val, y_val))
+              validation_split=0.1)
     results = model.evaluate(X_test, y_test)
 
     print(results)

@@ -15,7 +15,7 @@ chmod 777 get_data.sh
 ```bash
 python3 data-extract.py
 ```
-4. Run `CNN.py` or `DNN.py` to classify using CNN or DNN respectively
+4. Run `DNN.py` or `CNN.py` or `RNN.py` to classify using DNN or CNN or RNN respectively
 
 
 ## Happy Coding
