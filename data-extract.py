@@ -12,6 +12,7 @@ warnings.filterwarnings('ignore')
 
 
 def get_img_data():
+    print("Getting image data")
     cmap = plt.get_cmap('inferno')
 
     plt.figure(figsize=(10, 10))
@@ -30,6 +31,7 @@ def get_img_data():
 
 
 def get_features():
+    print("Getting features from image")
     header = 'filename chroma_stft rmse spectral_centroid spectral_bandwidth rolloff zero_crossing_rate'
     for i in range(1, 21):
         header += f' mfcc{i}'
@@ -65,6 +67,7 @@ def get_features():
 
 
 def resize_img():
+    print("Resizing images")
     genres = 'blues classical country disco hiphop jazz metal pop reggae rock'.split()
     for g in genres:
         pathlib.Path(f'./data/img_data_resized/{g}').mkdir(parents=True, exist_ok=True)
@@ -94,6 +97,7 @@ def convert_to_mp3():
         if ind % 10 == 0:
             print(f"Completed {ind//10}%")
 
+    os.chdir('../../')
     os.system("rm *.au")
 
 
@@ -108,8 +112,8 @@ def create_slices():
 
 
 if __name__ == '__main__':
-    # get_img_data()
-    # get_features()
-    # resize_img()
-    # convert_to_mp3()
+    get_img_data()
+    get_features()
+    resize_img()
+    convert_to_mp3()
     create_slices()
