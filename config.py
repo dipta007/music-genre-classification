@@ -12,7 +12,7 @@ sliceSize = 128
 
 #Dataset parameters
 filesPerGenre = 100
-validationRatio = 0.2
+validationRatio = 0.1
 testRatio = 0.1
 
 #Model parameters

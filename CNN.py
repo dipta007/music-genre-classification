@@ -1,9 +1,3 @@
-import numpy as np
-import os
-from PIL import Image
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from sklearn.preprocessing import OneHotEncoder
 from tensorflow import keras
 from dataset_tools import getDataset
 from config import filesPerGenre, sliceSize, validationRatio, testRatio, nbEpoch
@@ -21,20 +15,20 @@ def get_data():
 
 def get_model():
     model = keras.models.Sequential([
-        keras.layers.Conv2D(64, (2, 2), activation=keras.activations.elu, input_shape=(128, 128, 1)),
+        keras.layers.Conv2D(64, (2, 2), activation=keras.activations.relu, input_shape=(128, 128, 1)),
         keras.layers.MaxPooling2D(2, 2),
 
-        keras.layers.Conv2D(128, (2, 2), activation=keras.activations.elu),
+        keras.layers.Conv2D(128, (2, 2), activation=keras.activations.relu),
         keras.layers.MaxPooling2D(2, 2),
 
-        keras.layers.Conv2D(256, (2, 2), activation=keras.activations.elu),
-        keras.layers.MaxPooling2D(2, 2),
-
-        keras.layers.Conv2D(512, (2, 2), activation=keras.activations.elu),
-        keras.layers.MaxPooling2D(2, 2),
+        # keras.layers.Conv2D(256, (2, 2), activation=keras.activations.relu),
+        # keras.layers.MaxPooling2D(2, 2),
+        #
+        # keras.layers.Conv2D(512, (2, 2), activation=keras.activations.relu),
+        # keras.layers.MaxPooling2D(2, 2),
 
         keras.layers.Flatten(),
-        keras.layers.Dense(1024, activation=keras.activations.elu),
+        keras.layers.Dense(256, activation=keras.activations.relu),
         keras.layers.Dropout(0.5),
         keras.layers.Dense(10, activation=keras.activations.softmax),
     ])
